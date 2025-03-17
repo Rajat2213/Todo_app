@@ -6,7 +6,7 @@ const {
     deleteTaskHandler,
     getAllTasksHandler,
     restoreTaskHandler
-} = require('../controllers/taskController'); // ✅ Import only!
+} = require('../controllers/taskController'); 
 
 const authMiddleware = require('../middleware/authMiddleware');
 

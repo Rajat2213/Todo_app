@@ -26,12 +26,14 @@ const taskSlice = createSlice({
       // Ensure the payload is correctly structured
       state.tasks = [...state.tasks, action.payload.task || action.payload];
     },
+    // In your reducer, ensure that the updated task is correctly updated in the state
     updateTask: (state, action) => {
       console.log("updateTask reducer payload:", action.payload); // Log the payload
       state.tasks = state.tasks.map((task) =>
         task.id === action.payload.id ? { ...task, ...action.payload } : task
       );
-    },    
+    },
+
     deleteTask: (state, action) => {
       state.tasks = state.tasks.filter((task) => task.id !== action.payload);
     },

@@ -42,16 +42,27 @@ const TaskList = () => {
 
   const handleComplete = async (task) => {
     try {
-      const updatedTask = { id: task.id, completed: !task.completed };
-      await dispatch(updateTaskStatus(updatedTask));
-      toast.success(
-        `Task marked as ${updatedTask.completed ? "completed ✅" : "incomplete ⏳"}`
-      );
+      const updatedTask = { 
+        id: task.id, 
+        completed: !task.completed, 
+        title: task.title, // Optional, in case other fields need to be updated
+        description: task.description 
+      };
+      
+      const response = await dispatch(updateTaskStatus(updatedTask));
+      
+      // Check if the task was updated successfully
+      if (response) {
+        toast.success(
+          `Task marked as ${updatedTask.completed ? "completed ✅" : "incomplete ⏳"}`
+        );
+      }
     } catch (error) {
       toast.error(`Failed to update task ❌: ${error.message || error}`);
     }
   };
   
+
   const openUpdateModal = (task) => {
     setCurrentTask(task);
     setUpdatedTitle(task.title);
@@ -73,7 +84,7 @@ const TaskList = () => {
         title: updatedTitle,
         description: updatedDescription,
       };
-      await dispatch(updateTaskStatus(updatedTask));
+      await dispatch(updateTaskStatus(updatedTask)); // Call to update the task in the backend
       toast.success("Task updated successfully ✅");
       closeUpdateModal();
       // No need to refetch here if the reducer is updating correctly
@@ -132,7 +143,7 @@ const TaskList = () => {
                 <p className="text-gray-700 dark:text-white">
                   {task.description}
                 </p>
-                <div className="mt-4 flex space-x-4">
+                <div className="mt-4 flex space-x-4 gap-2 ">
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-4 rounded"
@@ -149,7 +160,7 @@ const TaskList = () => {
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.1 }}
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-4 rounded"
+                    className="bg-red-500  hover:bg-red-600 text-white font-bold py-1 px-4 rounded"
                     onClick={() => handleDelete(task.id)}
                   >
                     🗑️ Delete
@@ -177,7 +188,7 @@ const TaskList = () => {
                 </p>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
-                  className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-4 rounded"
+                  className="bg-gray-500 mt-3 hover:bg-gray-600 text-white font-bold py-1 px-4 rounded"
                   onClick={() => handleComplete(task)}
                 >
                   ⏳ Mark as Incomplete
@@ -198,7 +209,7 @@ const TaskList = () => {
             left: "50%",
             right: "auto",
             bottom: "auto",
-            width:"500px",
+            width: "500px",
             marginRight: "-50%",
             transform: "translate(-50%, -50%)",
             backgroundColor: "#fff",

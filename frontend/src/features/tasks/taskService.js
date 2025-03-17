@@ -45,14 +45,14 @@ export const createTask = (taskData) => async (dispatch) => {
 };
 
 // Update a task (e.g., mark as completed)
+// updateTaskStatus: This action handles marking the task as complete/incomplete
 export const updateTaskStatus = (task) => async (dispatch) => {
   try {
     const response = await axios.put(`${API_URL}/${task.id}`, task, {
       withCredentials: true,
       headers: { "Content-Type": "application/json" },
     });
-    console.log("updateTaskStatus API Response:", response.data); // Add this line
-    dispatch(updateTask(response.data));
+    dispatch(updateTask(response.data.task));  // Ensure you're passing the updated task
   } catch (error) {
     console.error("Failed to update task:", error);
     throw new Error(error.response?.data?.message || "Failed to update task");
