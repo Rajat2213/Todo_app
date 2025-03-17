@@ -1,54 +1,31 @@
-// src/features/auth/authService.js
-import axios from 'axios';
-import { setCredentials, logout } from './authSlice';
-import { toast } from 'react-toastify';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import api from '../../utils/api';
 
-const API_URL = 'http://localhost:5000/api/auth';
-
-// Register user
-export const register = (userData) => async (dispatch) => {
+// ✅ Register Thunk
+export const register = createAsyncThunk('auth/register', async (userData, { rejectWithValue }) => {
   try {
-    const response = await axios.post(`${API_URL}/register`, userData);
-    const { user, token } = response.data;
-    dispatch(setCredentials({ user, token }));
-    localStorage.setItem('token', token);
-    toast.success('Registered successfully!');
+    const response = await api.post('/auth/register', userData, { withCredentials: true });
+    return response.data;
   } catch (error) {
-    toast.error('Registration failed');
-    console.error('Registration failed:', error);
+    return rejectWithValue(error.response?.data?.message || 'Registration failed');
   }
-};
+});
 
-// Login user
-export const login = (email, password) => async (dispatch) => {
+// ✅ Login Thunk
+export const login = createAsyncThunk('auth/login', async ({ email, password }, { rejectWithValue }) => {
   try {
-    // Step 1: Check if the user exists in the database
-    const checkUserResponse = await axios.get(`${API_URL}/check-user`, {
-      params: { email },
-    });
-
-    if (!checkUserResponse.data.exists) {
-      toast.error('User does not exist');
-      return;
-    }
-
-    // Step 2: Proceed with login if the user exists
-    const loginResponse = await axios.post(`${API_URL}/login`, { email, password });
-    const { user, token } = loginResponse.data;
-
-    // Step 3: Dispatch credentials and store token
-    dispatch(setCredentials({ user, token }));
-    localStorage.setItem('token', token);
-    toast.success('Logged in successfully!');
+    const response = await api.post('/auth/login', { email, password }, { withCredentials: true });
+    return response.data;
   } catch (error) {
-    toast.error('Login failed');
-    console.error('Login failed:', error);
+    return rejectWithValue(error.response?.data?.message || 'Login failed');
   }
-};
+});
 
-// Logout user
-export const logoutUser = () => (dispatch) => {
-  localStorage.removeItem('token');
-  dispatch(logout());
-  toast.success('Logged out successfully!');
-};
+// ✅ Logout Thunk
+export const logoutUser = createAsyncThunk('auth/logout', async (_, { rejectWithValue }) => {
+  try {
+    await api.post('/auth/logout', {}, { withCredentials: true });
+  } catch (error) {
+    return rejectWithValue('Logout failed');
+  }
+});

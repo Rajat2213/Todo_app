@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   tasks: [],
@@ -7,7 +7,7 @@ const initialState = {
 };
 
 const taskSlice = createSlice({
-  name: 'tasks',
+  name: "tasks",
   initialState,
   reducers: {
     fetchTasksStart: (state) => {
@@ -15,7 +15,7 @@ const taskSlice = createSlice({
       state.error = null;
     },
     fetchTasksSuccess: (state, action) => {
-      state.tasks = action.payload;
+      state.tasks = Array.isArray(action.payload) ? action.payload : [];
       state.loading = false;
     },
     fetchTasksFailure: (state, action) => {
@@ -23,14 +23,15 @@ const taskSlice = createSlice({
       state.loading = false;
     },
     addTask: (state, action) => {
-      state.tasks.push(action.payload);
+      // Ensure the payload is correctly structured
+      state.tasks = [...state.tasks, action.payload.task || action.payload];
     },
     updateTask: (state, action) => {
-      const index = state.tasks.findIndex((task) => task.id === action.payload.id);
-      if (index !== -1) {
-        state.tasks[index] = action.payload;
-      }
-    },
+      console.log("updateTask reducer payload:", action.payload); // Log the payload
+      state.tasks = state.tasks.map((task) =>
+        task.id === action.payload.id ? { ...task, ...action.payload } : task
+      );
+    },    
     deleteTask: (state, action) => {
       state.tasks = state.tasks.filter((task) => task.id !== action.payload);
     },
@@ -45,4 +46,5 @@ export const {
   updateTask,
   deleteTask,
 } = taskSlice.actions;
+
 export default taskSlice.reducer;

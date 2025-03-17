@@ -1,34 +1,25 @@
-// src/utils/auth.js
-import jwtDecode from 'jwt-decode';
+import axios from 'axios';
 
-// Check if the user is authenticated
+// ✅ Check if the user is authenticated (using cookies)
 export const isAuthenticated = () => {
-  const token = localStorage.getItem('token');
-  if (!token) return false;
-
-  try {
-    const decoded = jwtDecode(token);
-    const currentTime = Date.now() / 1000;
-    return decoded.exp > currentTime; // Check if the token is expired
-  } catch (error) {
-    return false;
-  }
+  return document.cookie.split('; ').some(row => row.startsWith('token='));
 };
 
-// Get the current user from the token
-export const getCurrentUser = () => {
-  const token = localStorage.getItem('token');
-  if (!token) return null;
-
+// ✅ Get the current user by requesting the backend
+export const getCurrentUser = async () => {
   try {
-    const decoded = jwtDecode(token);
-    return decoded.user;
+    const response = await axios.get('http://localhost:5000/api/auth/me', {
+      withCredentials: true, // Important for sending cookies
+    });
+    return response.data; 
   } catch (error) {
+    console.error("Failed to fetch user:", error);
     return null;
   }
 };
 
-// Clear authentication data (logout)
+// ✅ Logout: Clear authentication cookie & refresh page
 export const clearAuth = () => {
-  localStorage.removeItem('token');
+  document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+  window.location.reload();
 };

@@ -32,34 +32,36 @@ const updateTask = async (id, userId, { title, description, completed }) => {
   return rows[0];
 };
 
-// Delete a task
+// Delete a task (soft delete)
 const deleteTask = async (id, userId) => {
   const query = `
-    DELETE FROM tasks
+    UPDATE tasks
+    SET deleted_at = NOW()
     WHERE id = $1 AND user_id = $2
     RETURNING *
   `;
   const { rows } = await pool.query(query, [id, userId]);
   return rows[0];
 };
+
 // Get all tasks (admin only)
 const getAllTasks = async () => {
-    const query = 'SELECT * FROM tasks';
-    const { rows } = await pool.query(query);
-    return rows;
-  };
-  
-  // Restore a deleted task (admin only)
-  const restoreTask = async (id) => {
-    const query = `
-      UPDATE tasks
-      SET deleted_at = NULL
-      WHERE id = $1
-      RETURNING *
-    `;
-    const { rows } = await pool.query(query, [id]);
-    return rows[0];
-  };
+  const query = 'SELECT * FROM tasks';
+  const { rows } = await pool.query(query);
+  return rows;
+};
+
+// Restore a deleted task (admin only)
+const restoreTask = async (id) => {
+  const query = `
+    UPDATE tasks
+    SET deleted_at = NULL
+    WHERE id = $1
+    RETURNING *
+  `;
+  const { rows } = await pool.query(query, [id]);
+  return rows[0];
+};
 
 module.exports = {
   createTask,
