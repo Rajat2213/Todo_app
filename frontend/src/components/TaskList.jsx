@@ -23,6 +23,7 @@ const TaskList = () => {
   const [updatedTitle, setUpdatedTitle] = useState("");
   const [updatedDescription, setUpdatedDescription] = useState("");
   const [showCompleted, setShowCompleted] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(""); // State for search term
 
   useEffect(() => {
     dispatch(fetchTasks()).catch(() => {
@@ -97,6 +98,19 @@ const TaskList = () => {
   const incompleteTasks = userTasks.filter((task) => !task.completed);
   const completedTasks = userTasks.filter((task) => task.completed);
 
+  // Filter tasks based on search term
+  const filteredIncompleteTasks = incompleteTasks.filter(
+    (task) =>
+      task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredCompletedTasks = completedTasks.filter(
+    (task) =>
+      task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -107,6 +121,16 @@ const TaskList = () => {
       <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
         📋 Your Tasks
       </h2>
+      {/* Search Bar */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search tasks..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
       <div className="flex space-x-4 mb-4">
         <button
           onClick={() => setShowCompleted(false)}
@@ -128,7 +152,7 @@ const TaskList = () => {
       <div>
         <AnimatePresence>
           {!showCompleted &&
-            incompleteTasks.map((task) => (
+            filteredIncompleteTasks.map((task) => (
               <motion.div
                 key={task.id}
                 initial={{ opacity: 0, x: -10 }}
@@ -171,7 +195,7 @@ const TaskList = () => {
         </AnimatePresence>
         <AnimatePresence>
           {showCompleted &&
-            completedTasks.map((task) => (
+            filteredCompletedTasks.map((task) => (
               <motion.div
                 key={task.id}
                 initial={{ opacity: 0, x: 10 }}

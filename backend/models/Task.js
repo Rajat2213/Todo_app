@@ -1,6 +1,5 @@
 const pool = require('../config/db');
 
-// Create a new task
 const createTask = async (userId, title, description) => {
   const query = `
     INSERT INTO tasks (user_id, title, description)
@@ -12,14 +11,12 @@ const createTask = async (userId, title, description) => {
   return rows[0];
 };
 
-// Get all tasks for a user
 const getTasksByUser = async (userId) => {
   const query = 'SELECT * FROM tasks WHERE user_id = $1';
   const { rows } = await pool.query(query, [userId]);
   return rows;
 };
 
-// Update a task
 const updateTask = async (id, userId, { title, description, completed }) => {
   const query = `
     UPDATE tasks
@@ -32,7 +29,6 @@ const updateTask = async (id, userId, { title, description, completed }) => {
   return rows[0];
 };
 
-// Delete a task (soft delete)
 const deleteTask = async (id, userId) => {
   const query = `
     UPDATE tasks
@@ -44,14 +40,12 @@ const deleteTask = async (id, userId) => {
   return rows[0];
 };
 
-// Get all tasks (admin only)
 const getAllTasks = async () => {
   const query = 'SELECT * FROM tasks';
   const { rows } = await pool.query(query);
   return rows;
 };
 
-// Restore a deleted task (admin only)
 const restoreTask = async (id) => {
   const query = `
     UPDATE tasks
